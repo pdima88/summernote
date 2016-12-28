@@ -6,7 +6,7 @@
  * Copyright 2013-2016 Alan Hong. and other contributors
  * summernote may be freely distributed under the MIT license./
  *
- * Date: 2016-08-07T05:11Z
+ * Date: 2016-12-28T09:42Z
  */
 (function (factory) {
   /* global define */
@@ -4840,15 +4840,33 @@
         event.preventDefault();
         event.stopPropagation();
 
-        var editableTop = $editable.offset().top - $document.scrollTop();
+        var isCodeview = context.invoke('codeview.isActivated');
+        if (isCodeview) {
+          var $codable = context.layoutInfo.codable;
+          if ($codable.data('cmEditor')) {
+            var y = $($codable.data('cmEditor').display.wrapper).offset().top;
+          } else {
+            var y = $codable.offset().top;
+          }
+        } else {
+          var y = $editable.offset().top;
+        }
+        var startTop = y - $document.scrollTop();
 
         $document.on('mousemove', function (event) {
-          var height = event.clientY - (editableTop + EDITABLE_PADDING);
+          var height = event.clientY - (startTop + EDITABLE_PADDING);
 
           height = (options.minheight > 0) ? Math.max(height, options.minheight) : height;
           height = (options.maxHeight > 0) ? Math.min(height, options.maxHeight) : height;
-
-          $editable.height(height);
+          if (isCodeview) {
+            if ($codable.data('cmEditor')) {
+              $codable.data('cmEditor').setSize(null, height);
+            } else {
+              $codable.height(height);
+            }
+          } else {
+            $editable.height(height);
+          }
         }).one('mouseup', function () {
           $document.off('mousemove');
         });
@@ -4877,8 +4895,8 @@
       var resize = function (size) {
         $editable.css('height', size.h);
         $codable.css('height', size.h);
-        if ($codable.data('cmeditor')) {
-          $codable.data('cmeditor').setsize(null, size.h);
+        if ($codable.data('cmEditor')) {
+          $codable.data('cmEditor').setSize(null, size.h);
         }
       };
 
@@ -5866,7 +5884,7 @@
     this.activate = function (isIncludeCodeview) {
       var $btn = $toolbar.find('button');
       if (!isIncludeCodeview) {
-        $btn = $btn.not('.btn-codeview');
+        $btn = $btn.not('.btn-codeview, .btn-fullscreen');
       }
       ui.toggleBtn($btn, true);
     };
@@ -5874,7 +5892,7 @@
     this.deactivate = function (isIncludeCodeview) {
       var $btn = $toolbar.find('button');
       if (!isIncludeCodeview) {
-        $btn = $btn.not('.btn-codeview');
+        $btn = $btn.not('.btn-codeview, .btn-fullscreen');
       }
       ui.toggleBtn($btn, false);
     };

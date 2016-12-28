@@ -50,7 +50,7 @@ define(function () {
     this.activate = function (isIncludeCodeview) {
       var $btn = $toolbar.find('button');
       if (!isIncludeCodeview) {
-        $btn = $btn.not('.btn-codeview');
+        $btn = $btn.not('.btn-codeview, .btn-fullscreen');
       }
       ui.toggleBtn($btn, true);
     };
@@ -58,7 +58,7 @@ define(function () {
     this.deactivate = function (isIncludeCodeview) {
       var $btn = $toolbar.find('button');
       if (!isIncludeCodeview) {
-        $btn = $btn.not('.btn-codeview');
+        $btn = $btn.not('.btn-codeview, .btn-fullscreen');
       }
       ui.toggleBtn($btn, false);
     };

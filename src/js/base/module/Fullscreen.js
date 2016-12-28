@@ -17,8 +17,8 @@ define([
       var resize = function (size) {
         $editable.css('height', size.h);
         $codable.css('height', size.h);
-        if ($codable.data('cmeditor')) {
-          $codable.data('cmeditor').setsize(null, size.h);
+        if ($codable.data('cmEditor')) {
+          $codable.data('cmEditor').setSize(null, size.h);
         }
       };
 

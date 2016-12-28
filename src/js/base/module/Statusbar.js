@@ -16,15 +16,33 @@ define(function () {
         event.preventDefault();
         event.stopPropagation();
 
-        var editableTop = $editable.offset().top - $document.scrollTop();
+        var isCodeview = context.invoke('codeview.isActivated');
+        if (isCodeview) {
+          var $codable = context.layoutInfo.codable;
+          if ($codable.data('cmEditor')) {
+            var y = $($codable.data('cmEditor').display.wrapper).offset().top;
+          } else {
+            var y = $codable.offset().top;
+          }
+        } else {
+          var y = $editable.offset().top;
+        }
+        var startTop = y - $document.scrollTop();
 
         $document.on('mousemove', function (event) {
-          var height = event.clientY - (editableTop + EDITABLE_PADDING);
+          var height = event.clientY - (startTop + EDITABLE_PADDING);
 
           height = (options.minheight > 0) ? Math.max(height, options.minheight) : height;
           height = (options.maxHeight > 0) ? Math.min(height, options.maxHeight) : height;
-
-          $editable.height(height);
+          if (isCodeview) {
+            if ($codable.data('cmEditor')) {
+              $codable.data('cmEditor').setSize(null, height);
+            } else {
+              $codable.height(height);
+            }
+          } else {
+            $editable.height(height);
+          }
         }).one('mouseup', function () {
           $document.off('mousemove');
         });
